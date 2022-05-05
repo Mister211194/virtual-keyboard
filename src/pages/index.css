@@ -81,20 +81,21 @@
     top: 5px;
     right: 5px;
     position: absolute;
-    width: 4px;
-    height: 4px;
+    width: 5px;
+    height: 5px;
     background: rgba(0, 0, 0, 0.3);
     border-radius: 50%;
 }
 
-.keyboard__key_active::after {
-    background: #ffffff;
+.keyboard__key_activatable_active::after {
+    background: #3ca300;
 }
 
-.keyboard__key:active{
+
+/* .keyboard__key:active{
     animation: move 0.2s;
     background-color: #fff;
-}
+} */
 
 .keyboard__key:hover{
     color: #000;
@@ -131,4 +132,9 @@
 .ControlLeft, .MetaLeft, .AltLeft, .AltRight, .ArrowLeft, .ArrowDown, .ArrowRight, .ControlRight {
     color: rgb(74, 74, 74);
     background-color: rgb(211 211 211);
+}
+
+.keyboard__key_active{
+    animation: move 0.3s infinite;
+    background-color: #fff;
 }
