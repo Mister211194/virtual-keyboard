@@ -64,6 +64,7 @@
     font-size: 16px;
     width: 42px;
     height: 42px;
+    padding: 0;
     background-color: rgb(247 246 250);
     margin-left: 6px;
     text-align: center;
@@ -106,22 +107,28 @@
     background-color: rgb(211 211 211);
 }
 
-.Backspase{
+.Backspace{
     width: 107px;
 }
 
-.Capslock{
+.CapsLock, .ShiftLeft{
     width: 107px;
 }
 
-.Tab{
+.Tab {
     width: 59px;
 }
 
-.Enter{
+.Enter, .ShiftRight{
     width: 90px;
 }
 
-.Spase{
-    width: 350px;
+.Space{
+    width: 347px;
+}
+
+.Backspace, .Tab, .Delete, .CapsLock, .Enter, .ShiftLeft, .ShiftRight, .ArrowUp,
+.ControlLeft, .MetaLeft, .AltLeft, .AltRight, .ArrowLeft, .ArrowDown, .ArrowRight, .ControlRight {
+    color: rgb(74, 74, 74);
+    background-color: rgb(211 211 211);
 }
