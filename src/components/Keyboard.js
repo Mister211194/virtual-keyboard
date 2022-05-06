@@ -13,7 +13,8 @@ export default class Keyboard {
         this._keys.forEach((rowElements) => {
             this._row = this._createKeysRow();
             rowElements.forEach((item) => {
-                this._key = this._switchLang(item);
+                this._item = item;
+                this._key = this._switchLangInit(item);
                 this._caps = item.caps ? item.caps : 'no-caps';
                 this._shift = item.shift ? 'shift' : 'no-shift';
                 this._Element = this._createElementKey(this._key, item.code, this._caps, this._shift);
@@ -35,6 +36,18 @@ export default class Keyboard {
                 keyElement.addEventListener("click", () => {
                     this._value = this._value.substring(0, this._value.length - 1)
                 });
+                document.addEventListener('keydown', (evt) => {
+                    if (evt.code === item.code) {
+                        keyElement.classList.add('keyboard__key_active');
+                        this._value = this._value.substring(0, this._value.length - 1);
+                        this._textarea.textContent = this._value
+                    }
+                })
+                document.addEventListener('keyup', (evt) => {
+                    if (evt.code === item.code) {
+                        keyElement.classList.remove('keyboard__key_active');
+                    }
+                })
                 break;
 
             case 'Tab':
@@ -46,16 +59,6 @@ export default class Keyboard {
                 break;
 
             case 'ShiftLeft':
-                keyElement.addEventListener('mousedown', () => {
-                    this._chengeShiftElements();
-                    this._shift = !this._shift;
-                });
-                keyElement.addEventListener('mouseup', () => {
-                    this._chengeShiftElements();
-                    this._shift = !this._shift;
-                })
-                break;
-
             case 'ShiftRight':
                 keyElement.addEventListener('mousedown', () => {
                     this._chengeShiftElements();
@@ -65,15 +68,49 @@ export default class Keyboard {
                     this._chengeShiftElements();
                     this._shift = !this._shift;
                 })
+                let allowed = true;
+                document.addEventListener('keydown', (evt) => {
+                    if (evt.repeat !== 'undefined') {
+                        allowed = !evt.repeat;
+                    }
+                    if (!allowed) return;
+                    if (evt.code === item.code) {
+                        keyElement.classList.add('keyboard__key_active');
+                        this._chengeShiftElements();
+                        this._shift = !this._shift;
+                    }
+                })
+                document.addEventListener('keyup', (evt) => {
+                    if (evt.code === item.code) {
+                        keyElement.classList.remove('keyboard__key_active');
+                        this._chengeShiftElements();
+                        this._shift = !this._shift;
+                        allowed = true;
+                    }
+                })
                 break;
-            case 'ControlLeft':
 
+            case 'ControlLeft':
+            case 'MetaLeft':
+            case 'AltLeft':
+            case 'AltRight':
+            case 'ControlRight':
+                document.addEventListener('keydown', (evt) => {
+                    evt.preventDefault();
+                    if (evt.code === item.code) {
+                        keyElement.classList.add('keyboard__key_active');
+                    }
+                })
+                document.addEventListener('keyup', (evt) => {
+                    if (evt.code === item.code) {
+                        keyElement.classList.remove('keyboard__key_active');
+                    }
+                })
                 break;
 
             default:
                 keyElement.addEventListener("click", () => {
                     this._value += keyElement.textContent;
-                    document.addEventListener('click', () => this._textarea.textContent = this._value)
                 });
                 this._toggleActiveClass(item.code, keyElement)
                 break;
@@ -85,7 +122,8 @@ export default class Keyboard {
             if (evt.code === code) {
                 keyElement.classList.add('keyboard__key_active');
                 this._value += keyElement.textContent;
-                document.addEventListener('keydown', () => this._textarea.textContent = this._value)
+                // document.addEventListener('keydown', () => this._textarea.textContent = this._value);
+                this._textarea.textContent = this._value;
             }
         })
         document.addEventListener('keyup', (evt) => {
@@ -94,27 +132,6 @@ export default class Keyboard {
             }
         })
     }
-
-    // _runOnKeys(...codes) {
-    //     let pressed = new Set();
-
-    //     document.addEventListener('keydown', function (event) {
-    //         pressed.add(event.code);
-
-    //         for (let code of codes) { // все ли клавиши из набора нажаты?
-    //             if (!pressed.has(code)) {
-    //                 return;
-    //             }
-    //         }
-    //         pressed.clear();
-    //         console.log(this._textarea)
-    //     });
-
-    //     document.addEventListener('keyup', function (event) {
-    //         pressed.delete(event.code);
-    //     });
-
-    // }
 
     _capsEvetnListener() {
         const capsKey = this._Element;
@@ -148,7 +165,7 @@ export default class Keyboard {
         this._caps = !this._caps;
     }
 
-    _switchLang(item) {
+    _switchLangInit(item) {
         if (this._lang) return item.key;
         else {
             if (!item.keyRu) return item.key;
@@ -254,10 +271,46 @@ export default class Keyboard {
         capsElements.forEach((el) => {
             el.textContent = this._shift ? el.textContent.toUpperCase() : el.textContent.toLowerCase();
         })
+        this._toggleCaps();
+    }
+
+    //Изменение языка на клавиатуре
+    _toggleLang(...codes) {
+        let pressed = new Set();
+
+        document.addEventListener('keydown', (evt) => {
+            pressed.add(evt.code);
+            for (let code of codes) { // все ли клавиши из набора нажаты?
+                if (!pressed.has(code)) {
+                    return;
+                }
+            }
+            pressed.clear();
+            const Elements = [...document.querySelectorAll('.keyboard__key')];
+            Elements.forEach((el, i) => {
+                const keys = this._keys.flat();
+                if (!this._lang) {
+                    el.textContent = keys[i].key;
+                    this._toggleCaps()
+                } else {
+                    el.textContent = keys[i].keyRu ? keys[i].keyRu : keys[i].key;
+                    this._toggleCaps()
+                }
+            })
+            this._lang = !this._lang
+        });
+        document.addEventListener('keyup', (evt) => {
+            pressed.delete(evt.code);
+        });
     }
 
     setEventListener() {
-        window.addEventListener("DOMContentLoaded", this._renderer());
-        document.addEventListener('click', () => this._lang = !this.lang)
+        window.addEventListener("DOMContentLoaded", () => {
+            this._renderer();
+            this._toggleLang('ControlLeft', 'AltLeft');
+            this._toggleLang('ControlLeft', 'ControlRight');
+        });
+        document.addEventListener('click', () => this._textarea.textContent = this._value)
+
     }
 }
