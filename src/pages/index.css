@@ -135,6 +135,6 @@
 }
 
 .keyboard__key_active{
-    animation: move 0.3s infinite;
+    animation: move 0.3s;
     background-color: #fff;
 }
