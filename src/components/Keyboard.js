@@ -66,15 +66,55 @@ export default class Keyboard {
                     this._shift = !this._shift;
                 })
                 break;
+            case 'ControlLeft':
+
+                break;
 
             default:
                 keyElement.addEventListener("click", () => {
                     this._value += keyElement.textContent;
                     document.addEventListener('click', () => this._textarea.textContent = this._value)
                 });
+                this._toggleActiveClass(item.code, keyElement)
                 break;
         }
     }
+
+    _toggleActiveClass(code, keyElement) {
+        document.addEventListener('keydown', (evt) => {
+            if (evt.code === code) {
+                keyElement.classList.add('keyboard__key_active');
+                this._value += keyElement.textContent;
+                document.addEventListener('keydown', () => this._textarea.textContent = this._value)
+            }
+        })
+        document.addEventListener('keyup', (evt) => {
+            if (evt.code === code) {
+                keyElement.classList.remove('keyboard__key_active');
+            }
+        })
+    }
+
+    // _runOnKeys(...codes) {
+    //     let pressed = new Set();
+
+    //     document.addEventListener('keydown', function (event) {
+    //         pressed.add(event.code);
+
+    //         for (let code of codes) { // все ли клавиши из набора нажаты?
+    //             if (!pressed.has(code)) {
+    //                 return;
+    //             }
+    //         }
+    //         pressed.clear();
+    //         console.log(this._textarea)
+    //     });
+
+    //     document.addEventListener('keyup', function (event) {
+    //         pressed.delete(event.code);
+    //     });
+
+    // }
 
     _capsEvetnListener() {
         const capsKey = this._Element;
@@ -190,10 +230,21 @@ export default class Keyboard {
                 el.textContent = this._shift ? '"' : "'";
             }
             if (el.textContent === ',' || el.textContent === '<') {
-                el.textContent = this._shift ? '<' : ',';
+                if (this._lang) { // English
+                    el.textContent = this._shift ? '<' : ',';
+                }
+                if (this._lang === false) { // rus
+                    el.textContent = '.'
+                }
+
             }
             if (el.textContent === '.' || el.textContent === '>') {
-                el.textContent = this._shift ? '>' : '.';
+                if (this._lang) { // English
+                    el.textContent = this._shift ? '>' : '.';
+                }
+                if (this._lang === false) { // rus
+                    el.textContent = this._shift ? ',' : '.';
+                }
             }
             if (el.textContent === '/' || el.textContent === '?') {
                 el.textContent = this._shift ? '?' : '/';
@@ -207,5 +258,6 @@ export default class Keyboard {
 
     setEventListener() {
         window.addEventListener("DOMContentLoaded", this._renderer());
+        document.addEventListener('click', () => this._lang = !this.lang)
     }
 }
