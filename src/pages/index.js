@@ -1,6 +1,7 @@
-import Section from '../components/Section.js';
-import Keyboard from '../components/Keyboard.js';
-import { keyboardConstants } from '../utils/constants.js';
+import './index.css';
+import Section from '../components/Section';
+import Keyboard from '../components/Keyboard';
+import { keyboardConstants } from '../utils/constants';
 
 function getLocalStorage() {
   return JSON.parse(window.localStorage.getItem('lang'));
