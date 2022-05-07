@@ -6,8 +6,18 @@ export default class Section {
   _createContainer() {
     this._container = document.createElement('main');
     this._container.classList.add('container');
-    this._container.append(this._createTitle(), this._createTextarea(), this._createKeyboardContainer());
+    this._container.append(this._createTitle(),
+      this._createTextarea(), this._createKeyboardContainer(),
+      this._createNewText('p', 'Клавиатура создана в операционной системе Windows'),
+      this._createNewText('p', 'Для переключения языка комбинация: левыe <b>ctrl</b> + <b>alt</b>'));
     return this._container;
+  }
+
+  _createNewText(block, string) {
+    this._text = document.createElement(block);
+    this._text.classList.add('text');
+    this._text.innerHTML = string;
+    return this._text;
   }
 
   _createTitle() {
