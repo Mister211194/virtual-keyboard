@@ -4,9 +4,9 @@ export default class Keyboard {
         this._keys = keys;
         this._lang = lang;
         this._caps = true;
-        this._value = '';
         this._shift = true;
         this._textarea = document.querySelector('.show-output');
+        this._cursorPos = this._textarea.selectionStart;
     }
 
     _renderer() {
@@ -33,14 +33,24 @@ export default class Keyboard {
                 break;
 
             case 'Backspace':
-                keyElement.addEventListener("click", () => {
-                    this._value = this._value.substring(0, this._value.length - 1)
+                this._backspaceEventListener(item, keyElement);
+                break;
+
+            case 'Tab':
+                keyElement.addEventListener('click', () => {
+                    const ValueBeforeCursor = this._textarea.value.slice(0, this._cursorPos);
+                    const ValueAfterCursor = this._textarea.value.slice(this._cursorPos);
+                    this._textarea.value = `${ValueBeforeCursor}${'    '}${ValueAfterCursor}`;
+                    this._cursorPos += 4;
                 });
                 document.addEventListener('keydown', (evt) => {
-                    if (evt.code === item.code) {
+                    if (evt.code === 'Tab') {
                         keyElement.classList.add('keyboard__key_active');
-                        this._value = this._value.substring(0, this._value.length - 1);
-                        this._textarea.textContent = this._value
+                        const ValueBeforeCursor = this._textarea.value.slice(0, this._cursorPos);
+                        const ValueAfterCursor = this._textarea.value.slice(this._cursorPos);
+                        this._textarea.value = `${ValueBeforeCursor}${'    '}${ValueAfterCursor}`;
+                        this._cursorPos += 4;
+                        this._textarea.selectionEnd = this._cursorPos;
                     }
                 })
                 document.addEventListener('keyup', (evt) => {
@@ -50,12 +60,50 @@ export default class Keyboard {
                 })
                 break;
 
-            case 'Tab':
-                keyElement.addEventListener('click', () => this._value += '    ')
+            case 'Delete':
+                keyElement.addEventListener('click', () => {
+                    const ValueBeforeCursor = this._textarea.value.slice(0, this._cursorPos);
+                    const ValueAfterCursor = this._textarea.value.slice(this._cursorPos);
+                    this._textarea.value = `${ValueBeforeCursor}${ValueAfterCursor.slice(1)}`;
+                });
+                document.addEventListener('keydown', (evt) => {
+                    if (evt.code === item.code) {
+                        keyElement.classList.add('keyboard__key_active');
+                        const ValueBeforeCursor = this._textarea.value.slice(0, this._cursorPos);
+                        const ValueAfterCursor = this._textarea.value.slice(this._cursorPos);
+                        this._textarea.value = `${ValueBeforeCursor}${ValueAfterCursor.slice(1)}`;
+                        this._textarea.selectionEnd = this._cursorPos;
+                    }
+                })
+                document.addEventListener('keyup', (evt) => {
+                    if (evt.code === item.code) {
+                        keyElement.classList.remove('keyboard__key_active');
+                    }
+                })
                 break;
 
             case 'Enter':
-                keyElement.addEventListener('click', () => this._value += '\n')
+                keyElement.addEventListener('click', () => {
+                    const ValueBeforeCursor = this._textarea.value.slice(0, this._cursorPos);
+                    const ValueAfterCursor = this._textarea.value.slice(this._cursorPos);
+                    this._textarea.value = `${ValueBeforeCursor}${'\n'}${ValueAfterCursor}`;
+                    this._cursorPos += 1;
+                });
+                document.addEventListener('keydown', (evt) => {
+                    if (evt.code === item.code) {
+                        keyElement.classList.add('keyboard__key_active');
+                        const ValueBeforeCursor = this._textarea.value.slice(0, this._cursorPos);
+                        const ValueAfterCursor = this._textarea.value.slice(this._cursorPos);
+                        this._textarea.value = `${ValueBeforeCursor}${'\n'}${ValueAfterCursor}`;
+                        this._cursorPos += 1;
+                        this._textarea.selectionEnd = this._cursorPos;
+                    }
+                })
+                document.addEventListener('keyup', (evt) => {
+                    if (evt.code === item.code) {
+                        keyElement.classList.remove('keyboard__key_active');
+                    }
+                })
                 break;
 
             case 'ShiftLeft':
@@ -110,27 +158,14 @@ export default class Keyboard {
 
             default:
                 keyElement.addEventListener("click", () => {
-                    this._value += keyElement.textContent;
+                    const ValueBeforeCursor = this._textarea.value.slice(0, this._cursorPos);
+                    const ValueAfterCursor = this._textarea.value.slice(this._cursorPos);
+                    this._textarea.value = `${ValueBeforeCursor}${keyElement.textContent}${ValueAfterCursor}`;
+                    this._cursorPos += 1;
                 });
-                this._toggleActiveClass(item.code, keyElement)
+                this._defaultKeyListener(item.code, keyElement)
                 break;
         }
-    }
-
-    _toggleActiveClass(code, keyElement) {
-        document.addEventListener('keydown', (evt) => {
-            if (evt.code === code) {
-                keyElement.classList.add('keyboard__key_active');
-                this._value += keyElement.textContent;
-                // document.addEventListener('keydown', () => this._textarea.textContent = this._value);
-                this._textarea.textContent = this._value;
-            }
-        })
-        document.addEventListener('keyup', (evt) => {
-            if (evt.code === code) {
-                keyElement.classList.remove('keyboard__key_active');
-            }
-        })
     }
 
     _capsEvetnListener() {
@@ -156,6 +191,46 @@ export default class Keyboard {
             if (evt.code === 'CapsLock') allowed = true;
         })
     }
+
+    _backspaceEventListener(item, keyElement) {
+        keyElement.addEventListener("click", () => {
+            this._textarea.value = this._textarea.value.substring(0, this._cursorPos - 1) + this._textarea.value.substring(this._cursorPos, this._value);
+            this._cursorPos > 0 ? this._cursorPos-- : this._cursorPos = 0;
+        });
+        document.addEventListener('keydown', (evt) => {
+            if (evt.code === item.code) {
+                keyElement.classList.add('keyboard__key_active');
+                this._textarea.value = this._textarea.value.substring(0, this._cursorPos - 1) + this._textarea.value.substring(this._cursorPos, this._value);
+                this._cursorPos > 0 ? this._cursorPos-- : this._cursorPos = 0;
+                this._textarea.selectionEnd = this._cursorPos;
+            }
+        })
+        document.addEventListener('keyup', (evt) => {
+            if (evt.code === item.code) {
+                keyElement.classList.remove('keyboard__key_active');
+            }
+        })
+    }
+
+    _defaultKeyListener(code, keyElement) {
+        document.addEventListener('keydown', (evt) => {
+            if (evt.code === code) {
+                keyElement.classList.add('keyboard__key_active');
+                const ValueBeforeCursor = this._textarea.value.slice(0, this._cursorPos);
+                const ValueAfterCursor = this._textarea.value.slice(this._cursorPos);
+                this._textarea.value = `${ValueBeforeCursor}${keyElement.textContent}${ValueAfterCursor}`;
+                this._cursorPos += 1;
+                this._textarea.selectionEnd = this._cursorPos;
+                console.log(this._textarea.value)
+            }
+        })
+        document.addEventListener('keyup', (evt) => {
+            if (evt.code === code) {
+                keyElement.classList.remove('keyboard__key_active');
+            }
+        })
+    }
+
 
     _toggleCaps() {
         const capsElements = [...document.querySelectorAll('.caps')];
@@ -310,7 +385,9 @@ export default class Keyboard {
             this._toggleLang('ControlLeft', 'AltLeft');
             this._toggleLang('ControlLeft', 'ControlRight');
         });
-        document.addEventListener('click', () => this._textarea.textContent = this._value)
-
+        this._textarea.addEventListener('click', () => {
+            this._cursorPos = this._textarea.selectionStart;
+            console.log(this._cursorPos);
+        })
     }
 }
