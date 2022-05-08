@@ -11,16 +11,16 @@ export default class Keyboard {
 
   _renderer() {
     this._keys.forEach((rowElements) => {
-      this._row = this._createKeysRow();
-      rowElements.forEach((item) => {
+      this._row = this._createKeysRow();  //создаю строки куда буду запихивать кнопки
+      rowElements.forEach((item) => { // обхожу элементы строки
         this._item = item;
-        this._key = this._switchLangInit(item);
-        this._caps = item.caps ? item.caps : 'no-caps';
-        this._shift = item.shift ? 'shift' : 'no-shift';
-        this._Element = this._createElementKey(this._key, item.code, this._caps, this._shift);
+        this._key = this._switchLangInit(item); // проверяю при первом рендере какой язык
+        this._caps = item.caps ? item.caps : 'no-caps'; // проверяю капс
+        this._shift = item.shift ? 'shift' : 'no-shift'; //Шифт
+        this._Element = this._createElementKey(this._key, item.code, this._caps, this._shift); // cСоздаю кнопки
         const keyElement = this._Element;
-        this._keyEventListener(item, keyElement);
-        this._row.append(keyElement);
+        this._keyEventListener(item, keyElement); // Вешаю на них слушатели 
+        this._row.append(keyElement); // Вставляю в дом
       })
       this._keyboardContainer.append(this._row);
     })
@@ -260,7 +260,6 @@ export default class Keyboard {
     this._keyElement.textContent = key;
     const Element = this._keyElement;
     Element.addEventListener('mousedown', () => Element.classList.add('keyboard__key_active'));
-    Element.addEventListener('mouseup', () => Element.classList.remove('keyboard__key_active'));
     return Element;
   }
 
@@ -386,9 +385,13 @@ export default class Keyboard {
       this._toggleLang('ControlLeft', 'AltLeft');
       this._toggleLang('ControlLeft', 'ControlRight');
     });
+    document.addEventListener('mouseup', () => {
+      [...document.querySelectorAll('.keyboard__key')].forEach((item) => {
+        item.classList.remove('keyboard__key_active');
+      })
+    })
     this._textarea.addEventListener('click', () => {
       this._cursorPos = this._textarea.selectionStart;
-      console.log(this._cursorPos);
     })
   }
 }
