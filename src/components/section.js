@@ -1,6 +1,5 @@
 export default class Section {
   constructor() {
-
   }
 
   _createContainer() {
