@@ -184,12 +184,13 @@ export default class Keyboard {
       if (!allowed) return;
       if (evt.code === 'CapsLock') {
         capsKey.classList.toggle('keyboard__key_activatable_active');
-        capsKey.classList.toggle('keyboard__key_active');
+        capsKey.classList.add('keyboard__key_active');
         this._toggleCaps();
       }
     })
     document.addEventListener('keyup', (evt) => {
       if (evt.code === 'CapsLock') allowed = true;
+      capsKey.classList.remove('keyboard__key_active');
     })
   }
 
