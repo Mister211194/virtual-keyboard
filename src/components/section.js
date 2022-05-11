@@ -1,12 +1,11 @@
 export default class Section {
-  constructor() {
-  }
-
   _createContainer() {
     this._container = document.createElement('main');
     this._container.classList.add('container');
-    this._container.append(this._createTitle(),
-      this._createTextarea(), this._createKeyboardContainer(),
+    this._container.append(
+      this._createTitle(),
+      this._createTextarea(),
+      this._createKeyboardContainer(),
       this._createNewText('p', 'Клавиатура создана в операционной системе Windows'),
       this._createNewText('p', 'Для переключения языка комбинация: левыe <b>ctrl</b> + <b>alt</b>'));
     return this._container;
@@ -40,6 +39,6 @@ export default class Section {
 
   renderToDom() {
     this._body = document.querySelector('body');
-    this._body.prepend(this._createContainer())
+    this._body.prepend(this._createContainer());
   }
 }

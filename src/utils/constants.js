@@ -37,4 +37,4 @@ export const keyboardConstants = {
     ]
   ],
   lang: true
-}
+};
